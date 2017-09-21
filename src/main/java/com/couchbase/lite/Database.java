@@ -1734,7 +1734,7 @@ public class Database implements StoreDelegate {
         if (filter == null) {
             return row;
         }
-        row.setDatabase(this);
+        row.moveToDatabase(this, null);
         if (filter.apply(row)) {
             return row;
         }

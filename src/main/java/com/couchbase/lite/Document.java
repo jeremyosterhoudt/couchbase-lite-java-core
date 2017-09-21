@@ -549,10 +549,12 @@ public class Document {
      */
     @InterfaceAudience.Private
     protected void loadCurrentRevisionFrom(QueryRow row) {
-        if (row.getDocumentRevisionId() == null) {
-            return;
-        }
         String revId = row.getDocumentRevisionId();
+        if (revId == null)
+            return;
+        Log.e(Log.TAG_QUERY, "currentReviewion -> " + currentRevision);
+        if(currentRevision!=null)
+            Log.e(Log.TAG_QUERY, "currentReviewion.ID -> " + currentRevision.getId());
         if (currentRevision == null || revIdGreaterThanCurrent(revId)) {
             forgetCurrentRevision();
             Map<String, Object> properties = row.getDocumentProperties();

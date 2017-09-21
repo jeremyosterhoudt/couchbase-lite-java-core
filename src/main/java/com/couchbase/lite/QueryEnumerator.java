@@ -32,14 +32,14 @@ public class QueryEnumerator implements Iterator<QueryRow>, Iterable<QueryRow> {
      * Constructor
      */
     @InterfaceAudience.Private
-    /* package */ QueryEnumerator(Database database, List<QueryRow> rows, long sequenceNumber) {
+    /* package */ QueryEnumerator(Database database, View view, List<QueryRow> rows, long sequenceNumber) {
         this.database = database;
         this.rows = rows;
         this.sequenceNumber = sequenceNumber;
 
         // Fill in the rows' database reference now
         for (QueryRow row : rows) {
-            row.setDatabase(database);
+            row.moveToDatabase(database, view);
         }
     }
 

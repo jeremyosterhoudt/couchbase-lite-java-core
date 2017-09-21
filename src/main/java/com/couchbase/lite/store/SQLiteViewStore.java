@@ -844,10 +844,9 @@ public class SQLiteViewStore implements ViewStore, QueryRowStore {
 
     @Override
     public Map<String, Object> getDocumentProperties(String docID, long sequence) {
-        // TODO: Implement
-        return null;
+        RevisionInternal rev = store.getDocument(docID, sequence);
+        return rev != null ? rev.getProperties() : null;
     }
-
 
     ///////////////////////////////////////////////////////////////////////////
     // Internal (Private) Instance Methods

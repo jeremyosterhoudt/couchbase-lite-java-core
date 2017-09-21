@@ -15,6 +15,9 @@ package com.couchbase.lite;
 
 import com.couchbase.lite.internal.InterfaceAudience;
 import com.couchbase.lite.internal.RevisionInternal;
+import com.couchbase.lite.store.QueryRowStore;
+import com.couchbase.lite.store.SQLiteStore;
+import com.couchbase.lite.util.Log;
 import com.couchbase.lite.util.Utils;
 
 import java.util.ArrayList;
@@ -66,6 +69,8 @@ public class QueryRow {
 
     private Database database;
 
+    private QueryRowStore queryRowStore;
+
     /**
      * Constructor
      * <p/>
@@ -87,15 +92,13 @@ public class QueryRow {
         this.documentRevision = docRevision;
     }
 
-
-    protected Database getDatabase() {
-        return database;
+    protected void moveToDatabase(Database database, View view) {
+        if (this.database != database) {
+            this.database = database;
+            if (view != null)
+                this.queryRowStore = view.getQueryRowStore();
+        }
     }
-
-    protected void setDatabase(Database database) {
-        this.database = database;
-    }
-
 
     /**
      * The document this row was mapped from.  This will be nil if a grouping was enabled in
@@ -125,6 +128,9 @@ public class QueryRow {
      */
     @InterfaceAudience.Public
     public Object getValue() {
+        if (value == null) {
+
+        }
         return value;
     }
 
@@ -177,11 +183,26 @@ public class QueryRow {
         if (documentRevision != null)
             rev = documentRevision.getRevID();
         if (rev == null) {
-            if (value instanceof Map) {
-                Map<String, Object> mapValue = (Map<String, Object>) value;
-                rev = (String) mapValue.get("_rev");
-                if (rev == null) {
-                    rev = (String) mapValue.get("rev");
+            // in case of all doc query
+            if (value != null) {
+                if (value instanceof Map) {
+                    Map<String, Object> mapValue = (Map<String, Object>) value;
+                    rev = (String) mapValue.get("_rev");
+                    if (rev == null) {
+                        rev = (String) mapValue.get("rev");
+                    }
+                }
+            }
+            if (rev == null && sequence >= 0) {
+                if (database.getStore() instanceof SQLiteStore) {
+                    Map<String, Object> mapValue = queryRowStore.getDocumentProperties(getDocumentId(), sequence);
+                    if (mapValue != null) {
+                        Log.e(Log.TAG_QUERY, "getDocumentRevisionID -> " + mapValue);
+                        rev = (String) mapValue.get("_rev");
+                        if (rev == null) {
+                            rev = (String) mapValue.get("rev");
+                        }
+                    }
                 }
             }
         }

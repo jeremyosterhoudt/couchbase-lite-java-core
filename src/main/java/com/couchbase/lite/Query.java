@@ -407,7 +407,7 @@ public class Query {
         this.postFilter = new Predicate<QueryRow>() {
             @Override
             public boolean apply(QueryRow type) {
-                type.setDatabase(database);
+                type.moveToDatabase(database, null);
                 return pf.apply(type);
             }
         };
@@ -445,7 +445,7 @@ public class Query {
         String viewName = (view != null) ? view.getName() : null;
         List<QueryRow> rows = database.queryViewNamed(viewName, getQueryOptions(), outSequence);
         lastSequence = outSequence.get(0);
-        return new QueryEnumerator(database, rows, lastSequence);
+        return new QueryEnumerator(database, view, rows, lastSequence);
     }
 
     /**
@@ -495,7 +495,7 @@ public class Query {
                     List<Long> outSequence = new ArrayList<Long>();
                     List<QueryRow> rows = database.queryViewNamed(viewName, options, outSequence);
                     long sequenceNumber = outSequence.get(0);
-                    QueryEnumerator enumerator = new QueryEnumerator(database, rows, sequenceNumber);
+                    QueryEnumerator enumerator = new QueryEnumerator(database, view, rows, sequenceNumber);
                     onComplete.completed(enumerator, null);
 
                 } catch (Throwable t) {

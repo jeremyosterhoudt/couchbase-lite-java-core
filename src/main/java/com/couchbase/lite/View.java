@@ -18,6 +18,7 @@
 package com.couchbase.lite;
 
 import com.couchbase.lite.internal.InterfaceAudience;
+import com.couchbase.lite.store.QueryRowStore;
 import com.couchbase.lite.store.ViewStore;
 import com.couchbase.lite.store.ViewStoreDelegate;
 import com.couchbase.lite.util.Log;
@@ -393,6 +394,13 @@ public final class View implements ViewStoreDelegate {
             return options.isReduce();
         else
             return this.reduceBlock != null;
+    }
+
+    QueryRowStore getQueryRowStore() {
+        if (viewStore instanceof QueryRowStore)
+            return (QueryRowStore) viewStore;
+        else
+            return null;
     }
 
     ///////////////////////////////////////////////////////////////////////////
